@@ -9,6 +9,8 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -20,6 +22,8 @@ import java.nio.channels.ClosedByInterruptException;
 public class FourSampleAuton extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
+        DcMotorEx SlideL = hardwareMap.get(DcMotorEx.class, "slideLeft");
+        DcMotorEx SlideR = hardwareMap.get(DcMotorEx.class, "slideRight");
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
         Servo outtakearml = hardwareMap.servo.get("outtakearmL");
         Servo outtakearmr = hardwareMap.servo.get("outtakearmR");
@@ -38,7 +42,6 @@ public class FourSampleAuton extends LinearOpMode {
                 drive.actionBuilder(new Pose2d(0, 0, 0))
                         .strafeToLinearHeading(new Vector2d(0, 0), 0)
                         .stopAndAdd(new Setpositionforlink(linkl, linkr, 0))
-                        .stopAndAdd(new Setpositionforservo(Servo,position))
                         .build());
     }
     public class Setpositionforservo implements Action {
@@ -78,4 +81,22 @@ public class FourSampleAuton extends LinearOpMode {
             return false;
         }
     }
+    public class Motorruntoposition implements Action {
+        DcMotor Lslide;
+        DcMotor Rslide;
+        double motorsetposition;
+        public Motorruntoposition(DcMotor Lslider, DcMotor Rslider, double sp) {
+            this.Lslide = Lslider;
+            this.Rslide = Rslider;
+            this.motorsetposition = sp;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            Lslide.setTargetPosition((int) motorsetposition);
+            Rslide.setTargetPosition((int) motorsetposition);
+            return false;
+        }
+    }
+
 }
