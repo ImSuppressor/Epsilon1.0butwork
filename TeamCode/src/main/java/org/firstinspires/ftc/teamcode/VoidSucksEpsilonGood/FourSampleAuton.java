@@ -30,40 +30,47 @@ public class FourSampleAuton extends LinearOpMode {
         Servo intakeswivel = hardwareMap.servo.get("intakeSwivel");
         Servo clawrotate = hardwareMap.servo.get("clawRotate");
         Servo outtakeclaw = hardwareMap.servo.get("outtakeClaw");
-        Servo outtakeswivel = hardwareMap.servo.get("outtakeswivel");
+        Servo outtakeswivel = hardwareMap.servo.get("outtakeSwivel");
         Servo linkr = hardwareMap.servo.get("linkR");
-        Servo linkl = hardwareMap.servo.get("LinkL");
+        Servo linkl = hardwareMap.servo.get("linkL");
 
         waitForStart();
 
         Actions.runBlocking(
                 drive.actionBuilder(new Pose2d(0, 0, 0))
-                        .stopAndAdd(new Slidesruntoposition(15))
+                        .stopAndAdd(new Slidesruntoposition(100))
                         .strafeToLinearHeading(new Vector2d(15, 15), 0)
+                        .stopAndAdd(new Intakeactions(0,0,0,0))
                         .waitSeconds(5)
                         .build());
     }
+
     public class Setpositionforservo implements Action {
         Servo servo;
         double position;
+
         public Setpositionforservo(Servo s, double p) {
             this.servo = s;
             this.position = p;
         }
+
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             servo.setPosition(position);
             return false;
         }
     }
+
     public class Setpositionforlink implements Action {
         Servo linkr = hardwareMap.servo.get("linkR");
         Servo linkl = hardwareMap.servo.get("LinkL");
         double InRobot;
         double position;
+
         public Setpositionforlink(double p) {
             this.position = p;
         }
+
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if ((position) == InRobot) {
@@ -80,25 +87,58 @@ public class FourSampleAuton extends LinearOpMode {
             }
         }
     }
-        public class Slidesruntoposition implements Action {
-            DcMotorEx SlideL = hardwareMap.get(DcMotorEx.class, "slideLeft");
-            DcMotorEx SlideR = hardwareMap.get(DcMotorEx.class, "slideRight");
-            double motorsetposition;
-            public Slidesruntoposition(double sp) {
-                this.motorsetposition = sp;
-            }
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                //find out which motor reversed
-                SlideL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                SlideR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                SlideL.setDirection(DcMotorSimple.Direction.REVERSE);
-                SlideR.setTargetPosition((int) motorsetposition);
-                SlideL.setTargetPosition((int) motorsetposition);
-                SlideR.setPower(1);
-                SlideL.setPower(1);
-                return false;
-            }
+
+    public class Slidesruntoposition implements Action {
+        DcMotorEx SlideL = hardwareMap.get(DcMotorEx.class, "slideLeft");
+        DcMotorEx SlideR = hardwareMap.get(DcMotorEx.class, "slideRight");
+        double motorsetposition;
+
+        public Slidesruntoposition(double sp) {
+            this.motorsetposition = sp;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            //find out which motor reversed
+            SlideL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            SlideR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            SlideL.setDirection(DcMotorSimple.Direction.REVERSE);
+            SlideR.setTargetPosition((int) motorsetposition);
+            SlideL.setTargetPosition((int) motorsetposition);
+            SlideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            SlideL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            SlideR.setPower(1);
+            SlideL.setPower(1);
+            return false;
         }
     }
+
+    public class Intakeactions implements Action {
+        Servo intakearm = hardwareMap.servo.get("intakeArm");
+        Servo intakeclaw = hardwareMap.servo.get("intakeClaw");
+        Servo intakeswivel = hardwareMap.servo.get("intakeSwivel");
+        Servo clawrotate = hardwareMap.servo.get("clawRotate");
+        double setpositionA;
+        double setpositionC;
+        double setpositionS;
+        double setpositionR;
+
+        public Intakeactions(double Arm, double Claw, double Swivel, double Rotate) {
+            this.setpositionA = Arm;
+            this.setpositionC = Claw;
+            this.setpositionS = Swivel;
+            this.setpositionR = Rotate;
+
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intakearm.setPosition(setpositionA);
+            intakeclaw.setPosition(setpositionC);
+            intakeswivel.setPosition(setpositionS);
+            clawrotate.setPosition(setpositionR);
+            return false;
+        }
+    }
+}
 
