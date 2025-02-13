@@ -140,5 +140,11 @@ public class FourSampleAuton extends LinearOpMode {
             return false;
         }
     }
+    public class EmptyClass implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            return false;
+        }
+    }
 }
 
