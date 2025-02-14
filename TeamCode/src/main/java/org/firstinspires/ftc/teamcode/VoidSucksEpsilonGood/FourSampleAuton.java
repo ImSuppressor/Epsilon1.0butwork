@@ -39,7 +39,7 @@ public class FourSampleAuton extends LinearOpMode {
         Servo outtakeswivel = hardwareMap.servo.get("outtakeSwivel");
         Servo linkr = hardwareMap.servo.get("linkR");
         Servo linkl = hardwareMap.servo.get("linkL");
-        //init actions for use during trajactories and/or parallel
+        //TODO:init actions for use during trajactories and/or parallel actions
         IntakeClaw intakeClaw = new IntakeClaw(hardwareMap);
         //init
         outtakearmr.setDirection(Servo.Direction.REVERSE);
@@ -54,9 +54,28 @@ public class FourSampleAuton extends LinearOpMode {
         intakeclaw.setPosition(.48);
         intakeswivel.setPosition(.03);
         clawrotate.setPosition(.5);
-        //init paths
-        Action sequence1 = drive.actionBuilder(new Pose2d(-64, -7, 0))
+        //TODO:init paths
+        Action sequence1 = drive.actionBuilder(new Pose2d(-64, -7, 0))//place first spec
                 .strafeToLinearHeading(new Vector2d(-27.5, -3), 0)
+                .build();
+        Action sequence2 = drive.actionBuilder(new Pose2d(-27.5, -3, 0))//move first sample
+                .strafeToLinearHeading(new Vector2d(-40, -30), -110)
+                .turn(-2.53)
+                .build();
+        Action sequence3 = drive.actionBuilder(new Pose2d(-27.5, -3, 0))//move second sample
+                .strafeToLinearHeading(new Vector2d(-50, -30), -110)
+                .build();
+        Action sequence4 = drive.actionBuilder(new Pose2d(-27.5, -3, 0))//move third sample
+                .strafeToLinearHeading(new Vector2d(-50, -30), -110)
+                .build();
+        Action sequence5 = drive.actionBuilder(new Pose2d(-27.5, -3, 0))//move to pickup spec 2
+                .strafeToLinearHeading(new Vector2d(-50, -30), -110)
+                .build();
+        Action PlaceSpec = drive.actionBuilder(new Pose2d(-27.5, -3, 0))//move to pickup spec 2
+                .strafeToLinearHeading(new Vector2d(-50, -30), -110)
+                .build();
+        Action GrabSpec = drive.actionBuilder(new Pose2d(-27.5, -3, 0))//move to pickup spec 2
+                .strafeToLinearHeading(new Vector2d(-50, -30), -110)
                 .build();
 
         waitForStart();
