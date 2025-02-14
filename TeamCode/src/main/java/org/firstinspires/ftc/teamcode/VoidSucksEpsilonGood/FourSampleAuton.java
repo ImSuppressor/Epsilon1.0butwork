@@ -6,6 +6,8 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PositionPathSeqBuilder;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -13,6 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -36,6 +39,9 @@ public class FourSampleAuton extends LinearOpMode {
         Servo outtakeswivel = hardwareMap.servo.get("outtakeSwivel");
         Servo linkr = hardwareMap.servo.get("linkR");
         Servo linkl = hardwareMap.servo.get("linkL");
+        //init actions for use during trajactories and/or parallel
+        IntakeClaw intakeClaw = new IntakeClaw(hardwareMap);
+        //init
         outtakearmr.setDirection(Servo.Direction.REVERSE);
         linkr.setDirection(Servo.Direction.REVERSE);
         outtakeclaw.setPosition(.6);
@@ -48,24 +54,20 @@ public class FourSampleAuton extends LinearOpMode {
         intakeclaw.setPosition(.48);
         intakeswivel.setPosition(.03);
         clawrotate.setPosition(.5);
+        //init paths
+        Action sequence1 = drive.actionBuilder(new Pose2d(-64, -7, 0))
+                .strafeToLinearHeading(new Vector2d(-27.5, -3), 0)
+                .build();
 
         waitForStart();
 
-        Actions.runBlocking(
-                drive.actionBuilder(new Pose2d(-64, -7, 0),
-                        new ParallelAction(
-                                new Action drive.actionBuilder(new Pose2d(0, 0, 0))
-                                        .stopAndAdd(new Slidesruntoposition(30))
-                                        .strafeToLinearHeading(new Vector2d(-27.5, -3), 0)
-                                        .waitSeconds(.25)
-                                        .stopAndAdd(new Setpositionforservo(outtakeclaw, 0.33))
-                                        .strafeToLinearHeading(new Vector2d(-40, -30), -110)
-                                        .stopAndAdd(new Intakeactions(.8, .45, .2, .5, .47))
-                                        .turn(-2.53)
-                                        .strafeToLinearHeading(new Vector2d(-50, -30), -110)
-                                        .waitSeconds(5)
-                                        .build());
+
+        Actions.runBlocking(new ParallelAction(
+                sequence1,
+                intakeClaw.intakeclawopen()
+        ));
     }
+
     public class Setpositionforservo implements Action {
         Servo servo;
         double position;
@@ -80,7 +82,6 @@ public class FourSampleAuton extends LinearOpMode {
             servo.setPosition(position);
             return false;
         }
-        public Action
     }
 
     public class Setpositionforlink implements Action {
@@ -88,9 +89,11 @@ public class FourSampleAuton extends LinearOpMode {
         Servo linkl = hardwareMap.servo.get("linkL");
         double InRobot;
         double position;
+
         public Setpositionforlink(double p) {
             this.position = p;
         }
+
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if ((position) == InRobot) {
@@ -107,13 +110,16 @@ public class FourSampleAuton extends LinearOpMode {
             }
         }
     }
+
     public class Slidesruntoposition implements Action {
         DcMotorEx SlideL = hardwareMap.get(DcMotorEx.class, "slideLeft");
         DcMotorEx SlideR = hardwareMap.get(DcMotorEx.class, "slideRight");
         double motorsetposition;
+
         public Slidesruntoposition(double sp) {
             this.motorsetposition = sp;
         }
+
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             //find out which motor reversed
@@ -129,6 +135,7 @@ public class FourSampleAuton extends LinearOpMode {
             return false;
         }
     }
+
     public class Intakeactions implements Action {
         Servo intakearm = hardwareMap.servo.get("intakeArm");
         Servo intakeclaw = hardwareMap.servo.get("intakeClaw");
@@ -160,10 +167,30 @@ public class FourSampleAuton extends LinearOpMode {
             return false;
         }
     }
-    public class EmptyClass implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            return false;
+    public class IntakeClaw {
+        public Servo intakeclaw;
+        IntakeClaw(HardwareMap hardwareMap) {
+            intakeclaw = hardwareMap.get(Servo.class, ("intakeClaw"));
+        }
+        public class intakeclawopen implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                intakeclaw.setPosition(.5);
+                return false;
+            }
+        }
+        public class intakeclawclose implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                intakeclaw.setPosition(.4);
+                return false;
+            }
+        }
+        public Action intakeclawopen(){
+            return new intakeclawopen();
+        }
+        public Action intakeclawclose() {
+            return new intakeclawclose();
         }
     }
 }
