@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -16,13 +17,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
+import java.util.Set;
+
 @Autonomous(name="4SampleNoRizzleNorTizzle")
 public class FourSampleAuton extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotorEx SlideL = hardwareMap.get(DcMotorEx.class, "slideLeft");
         DcMotorEx SlideR = hardwareMap.get(DcMotorEx.class, "slideRight");
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, 0));
         Servo outtakearml = hardwareMap.servo.get("outtakearmL");
         Servo outtakearmr = hardwareMap.servo.get("outtakearmR");
         Servo intakearm = hardwareMap.servo.get("intakeArm");
@@ -33,18 +36,36 @@ public class FourSampleAuton extends LinearOpMode {
         Servo outtakeswivel = hardwareMap.servo.get("outtakeSwivel");
         Servo linkr = hardwareMap.servo.get("linkR");
         Servo linkl = hardwareMap.servo.get("linkL");
+        outtakearmr.setDirection(Servo.Direction.REVERSE);
+        linkr.setDirection(Servo.Direction.REVERSE);
+        outtakeclaw.setPosition(.6);
+        outtakearmr.setPosition(.85);
+        outtakearml.setPosition(.85);
+        outtakeswivel.setPosition(.7);
+        linkl.setPosition(.1);
+        linkr.setPosition(.1);
+        intakearm.setPosition(.45);
+        intakeclaw.setPosition(.48);
+        intakeswivel.setPosition(.03);
+        clawrotate.setPosition(.5);
 
         waitForStart();
 
         Actions.runBlocking(
-                drive.actionBuilder(new Pose2d(0, 0, 0))
-                        .stopAndAdd(new Slidesruntoposition(100))
-                        .strafeToLinearHeading(new Vector2d(15, 15), 0)
-                        .stopAndAdd(new Intakeactions(0,0,0,0))
-                        .waitSeconds(5)
-                        .build());
+                drive.actionBuilder(new Pose2d(-64, -7, 0),
+                        new ParallelAction(
+                                new Action drive.actionBuilder(new Pose2d(0, 0, 0))
+                                        .stopAndAdd(new Slidesruntoposition(30))
+                                        .strafeToLinearHeading(new Vector2d(-27.5, -3), 0)
+                                        .waitSeconds(.25)
+                                        .stopAndAdd(new Setpositionforservo(outtakeclaw, 0.33))
+                                        .strafeToLinearHeading(new Vector2d(-40, -30), -110)
+                                        .stopAndAdd(new Intakeactions(.8, .45, .2, .5, .47))
+                                        .turn(-2.53)
+                                        .strafeToLinearHeading(new Vector2d(-50, -30), -110)
+                                        .waitSeconds(5)
+                                        .build());
     }
-
     public class Setpositionforservo implements Action {
         Servo servo;
         double position;
@@ -59,18 +80,17 @@ public class FourSampleAuton extends LinearOpMode {
             servo.setPosition(position);
             return false;
         }
+        public Action
     }
 
     public class Setpositionforlink implements Action {
         Servo linkr = hardwareMap.servo.get("linkR");
-        Servo linkl = hardwareMap.servo.get("LinkL");
+        Servo linkl = hardwareMap.servo.get("linkL");
         double InRobot;
         double position;
-
         public Setpositionforlink(double p) {
             this.position = p;
         }
-
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if ((position) == InRobot) {
@@ -87,16 +107,13 @@ public class FourSampleAuton extends LinearOpMode {
             }
         }
     }
-
     public class Slidesruntoposition implements Action {
         DcMotorEx SlideL = hardwareMap.get(DcMotorEx.class, "slideLeft");
         DcMotorEx SlideR = hardwareMap.get(DcMotorEx.class, "slideRight");
         double motorsetposition;
-
         public Slidesruntoposition(double sp) {
             this.motorsetposition = sp;
         }
-
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             //find out which motor reversed
@@ -112,31 +129,34 @@ public class FourSampleAuton extends LinearOpMode {
             return false;
         }
     }
-
     public class Intakeactions implements Action {
         Servo intakearm = hardwareMap.servo.get("intakeArm");
         Servo intakeclaw = hardwareMap.servo.get("intakeClaw");
         Servo intakeswivel = hardwareMap.servo.get("intakeSwivel");
         Servo clawrotate = hardwareMap.servo.get("clawRotate");
+        Servo linkr = hardwareMap.servo.get("linkR");
+        Servo linkl = hardwareMap.servo.get("linkL");
         double setpositionA;
         double setpositionC;
         double setpositionS;
         double setpositionR;
-
-        public Intakeactions(double Arm, double Claw, double Swivel, double Rotate) {
+        double linkpos;
+        public Intakeactions(double Arm, double Claw, double Swivel, double Rotate, double Linkage) {
             this.setpositionA = Arm;
             this.setpositionC = Claw;
             this.setpositionS = Swivel;
             this.setpositionR = Rotate;
-
+            this.linkpos = Linkage;
         }
-
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intakearm.setPosition(setpositionA);
             intakeclaw.setPosition(setpositionC);
             intakeswivel.setPosition(setpositionS);
             clawrotate.setPosition(setpositionR);
+            linkl.setDirection(Servo.Direction.REVERSE);
+            linkr.setPosition(linkpos);
+            linkl.setPosition(linkpos);
             return false;
         }
     }
