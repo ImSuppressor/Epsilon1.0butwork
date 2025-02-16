@@ -56,26 +56,26 @@ public class FiveSpecAuton extends LinearOpMode {
         //TODO:init paths
         Action  PlaceSpec1 = drive.actionBuilder(new Pose2d(-64, -7, 0))//place first spec
                 .stopAndAdd(new Slidesruntoposition(420))
-                .afterTime(.5,(new Slidesruntoposition(440)))
+                //.afterTime(.5,(new Slidesruntoposition(500)))
                 .strafeToLinearHeading(new Vector2d(-26, -0), 0)
                 .waitSeconds(.1)
                 .build();
         Action  MoveSample1 = drive.actionBuilder(new Pose2d(-28, -0, 0))//move first sample
-                .stopAndAdd(new Slidesruntoposition(0))
+                .stopAndAdd(new Slidesruntoposition(-100))
                 .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .46))
-                .strafeToLinearHeading(new Vector2d(-40, -33), 109.85)
+                .strafeToLinearHeading(new Vector2d(-40, -33), 109.9)
                 .turn(-2.48)
                 .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .35))
                 .build();
         Action  MoveSample2 = drive.actionBuilder(new Pose2d(-40, -33, 0))//move second sample
                 .afterTime(.4,(new Intakeactions(.87, .45, .125, .5, .47)))
-                .strafeToLinearHeading(new Vector2d(-40, -41), 109.85)
+                .strafeToLinearHeading(new Vector2d(-40, -41.85), 109.9)
                 .turn(-2.7)
                 .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .35))
                 .build();
-        Action MoveSample3 = drive.actionBuilder(new Pose2d(-40, -41, 0))//move third sample
+        Action MoveSample3 = drive.actionBuilder(new Pose2d(-40, -41.85 , 0))//move third sample
                 .afterTime(.35,new Intakeactions(.87, .45, .125, .5, .46))
-                .strafeToLinearHeading(new Vector2d(-40, -51.5), 109.85)
+                .strafeToLinearHeading(new Vector2d(-40, -51.5), 109.9)
                 .turn(-3)
                 .stopAndAdd(new Intakeactions(.45, .45, .03, .5, .1))
                 .build();
@@ -85,43 +85,43 @@ public class FiveSpecAuton extends LinearOpMode {
                 .build();
         Action PlaceSpec2 = drive.actionBuilder(new Pose2d(-68, -41, 0))//Place Specimen 2
                 .stopAndAdd(new Slidesruntoposition(420))
-                .afterTime(.5,(new Slidesruntoposition(440)))
+                //.afterTime(.5,(new Slidesruntoposition(440)))
                 .strafeToLinearHeading(new Vector2d(-24, -2), 0)
                 .build();
         Action GetSpec3 = drive.actionBuilder(new Pose2d(-24, -2, 0))//move to pickup spec 3
-                .stopAndAdd(new Slidesruntoposition(0))
+                .stopAndAdd(new Slidesruntoposition(-100))
                 .strafeToLinearHeading(new Vector2d(-67, -41), 0)
                 //.stopAndAdd(new Setpositionforservo(outtakeclaw,.4))
                 .build();
         Action PlaceSpec3 = drive.actionBuilder(new Pose2d(-67, -41, 0))//Place Specimen 3
                 .stopAndAdd(new Slidesruntoposition(420))
-                .afterTime(.5,(new Slidesruntoposition(440)))
+                //.afterTime(.5,(new Slidesruntoposition(440)))
                 .strafeToLinearHeading(new Vector2d(-24, -2), 0)
                 .build();
         Action GetSpec4 = drive.actionBuilder(new Pose2d(-24, -2, 0))//move to pickup spec 4
-                .stopAndAdd(new Slidesruntoposition(0))
+                .stopAndAdd(new Slidesruntoposition(-100))
                 .strafeToLinearHeading(new Vector2d(-67, -41), 0)
                 //.stopAndAdd(new Setpositionforservo(outtakeclaw,.4))
                 .build();
         Action PlaceSpec4 = drive.actionBuilder(new Pose2d(-67, -41, 0))//Place Specimen 4
                 .stopAndAdd(new Slidesruntoposition(420))
-                .afterTime(.5,(new Slidesruntoposition(440)))
+                //.afterTime(.5,(new Slidesruntoposition(440)))
                 .strafeToLinearHeading(new Vector2d(-24, -2), 0)
                 .build();
         Action GetSpec5 = drive.actionBuilder(new Pose2d(-24, -2, 0))//move to pickup spec 5
-                .stopAndAdd(new Slidesruntoposition(0))
+                .stopAndAdd(new Slidesruntoposition(-100))
                 .strafeToLinearHeading(new Vector2d(-67, -41), 0)
                 //.stopAndAdd(new Setpositionforservo(outtakeclaw,.4))
                 .build();
         Action PlaceSpec5 = drive.actionBuilder(new Pose2d(-67, -41, 0))//Place Specimen 5
                 .stopAndAdd(new Slidesruntoposition(420))
-                .afterTime(.5,(new Slidesruntoposition(440)))
+                //.afterTime(.5,(new Slidesruntoposition(440)))
                 .strafeToLinearHeading(new Vector2d(-24, -2), 0)
                 //.stopAndAdd(new Setpositionforservo(outtakeclaw,.5))
                 .build();
         Action Park = drive.actionBuilder(new Pose2d(-24, -2, 0))//move to park
-                .stopAndAdd(new Slidesruntoposition(0))
-                .strafeToLinearHeading(new Vector2d(-67, -41), 0)
+                .stopAndAdd(new Slidesruntoposition(-100))
+                .strafeToLinearHeading(new Vector2d(-67, -50), 0)
                 .build();
 
         waitForStart();

@@ -19,13 +19,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@Autonomous(name="5SpecimenSigmaMode")
+@Autonomous(name="FourSampleNoSigmaMode")
 public class FourSampleNoSigmaMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotorEx SlideL = hardwareMap.get(DcMotorEx.class, "slideLeft");
         DcMotorEx SlideR = hardwareMap.get(DcMotorEx.class, "slideRight");
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, 40, 90));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, 42.5,1.5708));
         Servo outtakearml = hardwareMap.servo.get("outtakearmL");
         Servo outtakearmr = hardwareMap.servo.get("outtakearmR");
         Servo intakearm = hardwareMap.servo.get("intakeArm");
@@ -55,16 +55,33 @@ public class FourSampleNoSigmaMode extends LinearOpMode {
         clawrotate.setPosition(.5);
         //TODO:init paths
 
-        Action PlaceSample1 = drive.actionBuilder(new Pose2d(-64, 40, 90))//place first spec
-                .stopAndAdd(new Slidesruntoposition(800))
-                .strafeToLinearHeading(new Vector2d(-60, -0), 135)
-
+        Action PlaceSample1 = drive.actionBuilder(new Pose2d(-64, 42.5, 1.5708))//place first spec
+                .stopAndAdd(new Slidesruntoposition(1000))
+                .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
+                .build();
+        Action GrabTape1 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
+                .stopAndAdd(new Slidesruntoposition(-100))
+                .afterTime(.2,new Intakeactions(.45, .45, .95, .5, .45))
+                .strafeToLinearHeading(new Vector2d(-52, 46), -2.82743)
+                .build();
+        Action GrabTape2 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
+                .stopAndAdd(new Slidesruntoposition(-100))
+                .afterTime(.2,new Intakeactions(.45, .45, .95, .5, .45))
+                .strafeToLinearHeading(new Vector2d(-52, 46), -2.82743)
+                .build();
+        Action GrabTape3 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
+                .stopAndAdd(new Slidesruntoposition(-100))
+                .afterTime(.2,new Intakeactions(.45, .45, .95, .5, .45))
+                .strafeToLinearHeading(new Vector2d(-52, 46), -3.61283)
                 .build();
 
         waitForStart();
 
         Actions.runBlocking(new SequentialAction(
-                        PlaceSample1
+                PlaceSample1,
+                GrabTape1,
+                GrabTape2,
+                GrabTape3
                 )
 
         );
