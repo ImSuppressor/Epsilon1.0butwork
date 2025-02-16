@@ -20,12 +20,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Autonomous(name="5SpecimenSigmaMode")
-public class FiveSpecAuton extends LinearOpMode {
+public class FourSampleNoSigmaMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotorEx SlideL = hardwareMap.get(DcMotorEx.class, "slideLeft");
         DcMotorEx SlideR = hardwareMap.get(DcMotorEx.class, "slideRight");
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, 0));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, 40, 90));
         Servo outtakearml = hardwareMap.servo.get("outtakearmL");
         Servo outtakearmr = hardwareMap.servo.get("outtakearmR");
         Servo intakearm = hardwareMap.servo.get("intakeArm");
@@ -40,7 +40,7 @@ public class FiveSpecAuton extends LinearOpMode {
         OuttakeClaw outtakeClaw = new OuttakeClaw(hardwareMap);
         Slides Slides = new Slides(hardwareMap);
         OUTTAKEARM OUTTAKEARM = new OUTTAKEARM(hardwareMap);
-        //init
+        //TODO:init
         outtakearmr.setDirection(Servo.Direction.REVERSE);
         linkr.setDirection(Servo.Direction.REVERSE);
         outtakeclaw.setPosition(.6);
@@ -54,147 +54,23 @@ public class FiveSpecAuton extends LinearOpMode {
         intakeswivel.setPosition(.03);
         clawrotate.setPosition(.5);
         //TODO:init paths
-        Action  PlaceSpec1 = drive.actionBuilder(new Pose2d(-64, -7, 0))//place first spec
-                .stopAndAdd(new Slidesruntoposition(420))
-                .afterTime(.5,(new Slidesruntoposition(440)))
-                .strafeToLinearHeading(new Vector2d(-26, -0), 0)
-                .waitSeconds(.1)
-                .build();
-        Action  MoveSample1 = drive.actionBuilder(new Pose2d(-28, -0, 0))//move first sample
-                .stopAndAdd(new Slidesruntoposition(0))
-                .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .46))
-                .strafeToLinearHeading(new Vector2d(-40, -33), 109.85)
-                .turn(-2.48)
-                .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .35))
-                .build();
-        Action  MoveSample2 = drive.actionBuilder(new Pose2d(-40, -33, 0))//move second sample
-                .afterTime(.4,(new Intakeactions(.87, .45, .125, .5, .47)))
-                .strafeToLinearHeading(new Vector2d(-40, -41), 109.85)
-                .turn(-2.7)
-                .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .35))
-                .build();
-        Action MoveSample3 = drive.actionBuilder(new Pose2d(-40, -41, 0))//move third sample
-                .afterTime(.35,new Intakeactions(.87, .45, .125, .5, .46))
-                .strafeToLinearHeading(new Vector2d(-40, -51.5), 109.85)
-                .turn(-3)
-                .stopAndAdd(new Intakeactions(.45, .45, .03, .5, .1))
-                .build();
-        Action GetSpec2 = drive.actionBuilder(new Pose2d(-40, -51.5, 0))//move to pickup spec 2
-                .strafeToLinearHeading(new Vector2d(-68, -41), 0)
-                //.stopAndAdd(new Setpositionforservo(outtakeclaw,.4))
-                .build();
-        Action PlaceSpec2 = drive.actionBuilder(new Pose2d(-68, -41, 0))//Place Specimen 2
-                .stopAndAdd(new Slidesruntoposition(420))
-                .afterTime(.5,(new Slidesruntoposition(440)))
-                .strafeToLinearHeading(new Vector2d(-24, -2), 0)
-                .build();
-        Action GetSpec3 = drive.actionBuilder(new Pose2d(-24, -2, 0))//move to pickup spec 3
-                .stopAndAdd(new Slidesruntoposition(0))
-                .strafeToLinearHeading(new Vector2d(-67, -41), 0)
-                //.stopAndAdd(new Setpositionforservo(outtakeclaw,.4))
-                .build();
-        Action PlaceSpec3 = drive.actionBuilder(new Pose2d(-67, -41, 0))//Place Specimen 3
-                .stopAndAdd(new Slidesruntoposition(420))
-                .afterTime(.5,(new Slidesruntoposition(440)))
-                .strafeToLinearHeading(new Vector2d(-24, -2), 0)
-                .build();
-        Action GetSpec4 = drive.actionBuilder(new Pose2d(-24, -2, 0))//move to pickup spec 4
-                .stopAndAdd(new Slidesruntoposition(0))
-                .strafeToLinearHeading(new Vector2d(-67, -41), 0)
-                //.stopAndAdd(new Setpositionforservo(outtakeclaw,.4))
-                .build();
-        Action PlaceSpec4 = drive.actionBuilder(new Pose2d(-67, -41, 0))//Place Specimen 4
-                .stopAndAdd(new Slidesruntoposition(420))
-                .afterTime(.5,(new Slidesruntoposition(440)))
-                .strafeToLinearHeading(new Vector2d(-24, -2), 0)
-                .build();
-        Action GetSpec5 = drive.actionBuilder(new Pose2d(-24, -2, 0))//move to pickup spec 5
-                .stopAndAdd(new Slidesruntoposition(0))
-                .strafeToLinearHeading(new Vector2d(-67, -41), 0)
-                //.stopAndAdd(new Setpositionforservo(outtakeclaw,.4))
-                .build();
-        Action PlaceSpec5 = drive.actionBuilder(new Pose2d(-67, -41, 0))//Place Specimen 5
-                .stopAndAdd(new Slidesruntoposition(420))
-                .afterTime(.5,(new Slidesruntoposition(440)))
-                .strafeToLinearHeading(new Vector2d(-24, -2), 0)
-                //.stopAndAdd(new Setpositionforservo(outtakeclaw,.5))
-                .build();
-        Action Park = drive.actionBuilder(new Pose2d(-24, -2, 0))//move to park
-                .stopAndAdd(new Slidesruntoposition(0))
-                .strafeToLinearHeading(new Vector2d(-67, -41), 0)
+
+        Action PlaceSample1 = drive.actionBuilder(new Pose2d(-64, 40, 90))//place first spec
+                .stopAndAdd(new Slidesruntoposition(800))
+                .strafeToLinearHeading(new Vector2d(-60, -0), 135)
+
                 .build();
 
         waitForStart();
 
-//TODO: WRITE THE CODE HERE YOU MORON
-
-        Actions.runBlocking(new SequentialAction(//place spec 1
-                PlaceSpec1,
-                outtakeClaw.outtakeclawopen()
-
-        ));
-        Actions.runBlocking(new SequentialAction(//move samples
-                OUTTAKEARM.grab(),
-                MoveSample1,
-                MoveSample2,
-                MoveSample3
-                )
-        );
-        Actions.runBlocking(new SequentialAction(//grab spec 2
-                GetSpec2,
-                outtakeClaw.outtakeclawclose()
+        Actions.runBlocking(new SequentialAction(
+                        PlaceSample1
                 )
 
         );
-        Actions.runBlocking(new SequentialAction(//place spec 2
-                OUTTAKEARM.place(),
-                PlaceSpec2,
-                outtakeClaw.outtakeclawopen()
-                )
-        );
-        Actions.runBlocking(new SequentialAction(//grab spec 3
-                OUTTAKEARM.grab(),
-                GetSpec3,
-                outtakeClaw.outtakeclawclose()
-                        )
-        );
-        Actions.runBlocking(new SequentialAction(//place spec 3
-                OUTTAKEARM.place(),
-                PlaceSpec3,
-                outtakeClaw.outtakeclawopen()
-                )
-        );
-        Actions.runBlocking(new SequentialAction(// grab spec 4
-                OUTTAKEARM.grab(),
-                GetSpec4,
-                outtakeClaw.outtakeclawclose()
-                )
-        );
-        Actions.runBlocking(new SequentialAction(//place spec 4
-                OUTTAKEARM.place(),
-                PlaceSpec4,
-                outtakeClaw.outtakeclawopen()
-                )
-        );
-        Actions.runBlocking(new SequentialAction(// grab spec 5
-                OUTTAKEARM.grab(),
-                GetSpec5,
-                outtakeClaw.outtakeclawclose()
-                )
-        );
-        Actions.runBlocking(new SequentialAction(//place spec 5
-                OUTTAKEARM.place(),
-                PlaceSpec5,
-                outtakeClaw.outtakeclawopen()
-                )
-        );
-        Actions.runBlocking(new SequentialAction(// park
-                OUTTAKEARM.grab(),
-                Park
-                )
-        );
+
     }
-
+    //TODO:Subclasses go here
     public class Setpositionforservo implements Action {
         Servo servo;
         double position;
@@ -412,5 +288,5 @@ public class FiveSpecAuton extends LinearOpMode {
             return new place();
         }
     }
-}
 
+}

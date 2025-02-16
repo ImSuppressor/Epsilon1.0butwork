@@ -6,10 +6,15 @@ import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 public class MeepMeepTesting {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
-
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -44,7 +49,12 @@ public class MeepMeepTesting {
                 .strafeToLinearHeading(new Vector2d(-64, -25), 0)
                 .build());
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)
+        Image img = null;
+        try { img = ImageIO.read(new File("C:\\Users\\Dylan Gibbs\\Downloads\\Juice-INTO-THE-DEEP-Dark")); }
+        catch(IOException e) {}
+
+        meepMeep.setBackground(img)
+
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(myBot)
