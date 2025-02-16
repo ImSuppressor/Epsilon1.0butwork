@@ -55,7 +55,10 @@ public class FiveSpecAuton extends LinearOpMode {
         clawrotate.setPosition(.5);
         //TODO:init paths
         Action  PlaceSpec1 = drive.actionBuilder(new Pose2d(-64, -7, 0))//place first spec
-                .strafeToLinearHeading(new Vector2d(-28, -0), 0)
+                .stopAndAdd(new Slidesruntoposition(420))
+                .afterTime(1,(new Slidesruntoposition(440)))
+                .strafeToLinearHeading(new Vector2d(-26, -0), 0)
+                .waitSeconds(.1)
                 .build();
         Action  MoveSample1 = drive.actionBuilder(new Pose2d(-28, -0, 0))//move first sample
                 .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .46))
@@ -64,107 +67,122 @@ public class FiveSpecAuton extends LinearOpMode {
                 .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .35))
                 .build();
         Action  MoveSample2 = drive.actionBuilder(new Pose2d(-40, -33, 0))//move second sample
-                .afterTime(.75,(new Intakeactions(.87, .45, .125, .5, .46)))
-                .strafeToLinearHeading(new Vector2d(-40, -41), 109.9)
-                .turn(-2.55)
+                .afterTime(.5,(new Intakeactions(.87, .45, .125, .5, .46)))
+                .strafeToLinearHeading(new Vector2d(-40, -41.25), 109.9)
+                .turn(-2.7)
                 .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .35))
                 .build();
-        Action MoveSample3 = drive.actionBuilder(new Pose2d(-40, -41, 0))//move third sample
-                .afterTime(.75,new Intakeactions(.87, .45, .125, .5, .46))
-                .strafeToLinearHeading(new Vector2d(-40, -48), 109.9)
+        Action MoveSample3 = drive.actionBuilder(new Pose2d(-40, -41.25, 0))//move third sample
+                .afterTime(.35,new Intakeactions(.87, .45, .125, .5, .46))
+                .strafeToLinearHeading(new Vector2d(-40, -51.5), 109.9)
                 .turn(-3)
                 .stopAndAdd(new Intakeactions(.45, .45, .03, .5, .1))
                 .build();
-        Action GetSpec2 = drive.actionBuilder(new Pose2d(-40, -48, 0))//move to pickup spec 2 TODO:Find out what heading so heading=0 means facing wall
-                .strafeToLinearHeading(new Vector2d(-64, -25), -110)
+        Action GetSpec2 = drive.actionBuilder(new Pose2d(-40, -51.5, 0))//move to pickup spec 2
+                .strafeToLinearHeading(new Vector2d(-68, -41), 0)
                 .build();
-        Action GetSpec345 = drive.actionBuilder(new Pose2d(-27.5, -3, 0))//move to pickup spec 3,4,5
-                .strafeToLinearHeading(new Vector2d(-50, -30), -110)
+        Action GetSpec345 = drive.actionBuilder(new Pose2d(-24, -2, 0))//move to pickup spec 3,4,5
+                .strafeToLinearHeading(new Vector2d(-67, -41), 0)
                 .build();
-        Action PlaceSpec2345 = drive.actionBuilder(new Pose2d(-64, -25, 0))//Place Specimen 2,3,4,5
-                .strafeToLinearHeading(new Vector2d(-28, -2), -110)
+        Action PlaceSpec2 = drive.actionBuilder(new Pose2d(-68, -41, 0))//Place Specimen 2,3,4,5
+                .strafeToLinearHeading(new Vector2d(-24, -2), 0)
+                .build();
+        Action PlaceSpec345 = drive.actionBuilder(new Pose2d(-67, -41, 0))//Place Specimen 2,3,4,5
+                .strafeToLinearHeading(new Vector2d(-24, -2), 0)
                 .build();
 
         waitForStart();
 
 //TODO: WRITE THE CODE HERE YOU MORON
 
+        Actions.runBlocking(new SequentialAction(
+                        PlaceSpec1,
+                        outtakeClaw.outtakeclawopen()
+
+        ));
+        Actions.runBlocking(new SequentialAction(
+                        Slides.slidesdown(),
+                        OUTTAKEARM.grab(),
+                        MoveSample1,
+                        MoveSample2,
+                        MoveSample3,
+                        GetSpec2,
+                        outtakeClaw.outtakeclawclose()
+                )
+        );
         Actions.runBlocking(new ParallelAction(
+                OUTTAKEARM.place(),
                 Slides.slidesSpec(),
                 new SequentialAction(
-                        PlaceSpec1,
+                        PlaceSpec2,
                         Slides.slidesPlaceSpec(),
-                        outtakeClaw.outtakeclawopen(),
-                        new ParallelAction(
-                                Slides.slidesdown(),
-                                OUTTAKEARM.grab(),
-                                new SequentialAction(
-                                        MoveSample1,
-                                        MoveSample2,
-                                        MoveSample3,
-                                        GetSpec2,
-                                        outtakeClaw.outtakeclawclose(),
-                                        new ParallelAction(
-                                                OUTTAKEARM.place(),
-                                                Slides.slidesSpec(),
-                                                new SequentialAction(
-                                                        PlaceSpec2345,
-                                                        Slides.slidesPlaceSpec(),
-                                                        outtakeClaw.outtakeclawopen(),
-                                                        new ParallelAction(//2nd spec placed
-                                                                Slides.slidesdown(),
-                                                                OUTTAKEARM.grab(),
-                                                                new SequentialAction(
-                                                                        GetSpec345,
-                                                                        outtakeClaw.outtakeclawclose(),
-                                                                        new ParallelAction(
-                                                                                OUTTAKEARM.place(),
-                                                                                Slides.slidesSpec(),
-                                                                                new SequentialAction(
-                                                                                        PlaceSpec2345,
-                                                                                        Slides.slidesPlaceSpec(),
-                                                                                        outtakeClaw.outtakeclawopen(),
-                                                                                        new ParallelAction(//3rd spec placed
-                                                                                                Slides.slidesdown(),
-                                                                                                OUTTAKEARM.grab(),
-                                                                                                new SequentialAction(
-                                                                                                        GetSpec345,
-                                                                                                        outtakeClaw.outtakeclawclose(),
-                                                                                                        new ParallelAction(//grab 4th spec
-                                                                                                                OUTTAKEARM.place(),
-                                                                                                                Slides.slidesSpec(),
-                                                                                                                new SequentialAction(
-                                                                                                                        PlaceSpec2345,
-                                                                                                                        Slides.slidesPlaceSpec(),
-                                                                                                                        outtakeClaw.outtakeclawopen(),
-                                                                                                                        new ParallelAction(//4th spec placed
-                                                                                                                                Slides.slidesdown(),
-                                                                                                                                OUTTAKEARM.grab(),
-                                                                                                                                new SequentialAction(
-                                                                                                                                        GetSpec345,
-                                                                                                                                        outtakeClaw.outtakeclawclose(),
-                                                                                                                                        new ParallelAction(//grab 5th spec
-                                                                                                                                                OUTTAKEARM.place(),
-                                                                                                                                                Slides.slidesSpec(),
-                                                                                                                                                new SequentialAction(
-                                                                                                                                                        PlaceSpec2345,
-                                                                                                                                                        Slides.slidesPlaceSpec(),
-                                                                                                                                                        outtakeClaw.outtakeclawopen(),
-                                                                                                                                                        new ParallelAction(//5th spec placed
-                                                                                                                                                                Slides.slidesdown(),
-                                                                                                                                                                OUTTAKEARM.grab(),
-                                                                                                                                                                new SequentialAction(
-                                                                                                                                                                        GetSpec345
-                                                                                )
-                                                                        )
-
-                                                                )
-                                                        )
-                                                )
-                                )
+                        outtakeClaw.outtakeclawopen()
+                )
+                )
+        );
+        Actions.runBlocking(new ParallelAction(//2nd spec placed
+                        Slides.slidesdown(),
+                        OUTTAKEARM.grab(),
+                        new SequentialAction(
+                                GetSpec345,
+                                outtakeClaw.outtakeclawclose()
                         )
                 )
-        )))))))))))));
+        );
+        Actions.runBlocking(
+                new ParallelAction(
+                        OUTTAKEARM.place(),
+                        Slides.slidesSpec(),
+                        new SequentialAction(
+                                PlaceSpec345,
+                                Slides.slidesPlaceSpec(),
+                                outtakeClaw.outtakeclawopen()
+                        )
+                )
+        );
+        Actions.runBlocking(new ParallelAction(//3rd spec placed
+                Slides.slidesdown(),
+                OUTTAKEARM.grab(),
+                new SequentialAction(
+                        GetSpec345,
+                        outtakeClaw.outtakeclawclose()
+                )
+                )
+        );
+
+//                                                                                                        new ParallelAction(//grab 4th spec
+//                                                                                                                OUTTAKEARM.place(),
+//                                                                                                                Slides.slidesSpec(),
+//                                                                                                                new SequentialAction(
+//                                                                                                                        PlaceSpec2345,
+//                                                                                                                        Slides.slidesPlaceSpec(),
+//                                                                                                                        outtakeClaw.outtakeclawopen(),
+//                                                                                                                        new ParallelAction(//4th spec placed
+//                                                                                                                                Slides.slidesdown(),
+//                                                                                                                                OUTTAKEARM.grab(),
+//                                                                                                                                new SequentialAction(
+//                                                                                                                                        GetSpec345,
+//                                                                                                                                        outtakeClaw.outtakeclawclose(),
+//                                                                                                                                        new ParallelAction(//grab 5th spec
+//                                                                                                                                                OUTTAKEARM.place(),
+//                                                                                                                                                Slides.slidesSpec(),
+//                                                                                                                                                new SequentialAction(
+//                                                                                                                                                        PlaceSpec2345,
+//                                                                                                                                                        Slides.slidesPlaceSpec(),
+//                                                                                                                                                        outtakeClaw.outtakeclawopen(),
+//                                                                                                                                                        new ParallelAction(//5th spec placed
+//                                                                                                                                                                Slides.slidesdown(),
+//                                                                                                                                                                OUTTAKEARM.grab(),
+//                                                                                                                                                                new SequentialAction(
+//                                                                                                                                                                        GetSpec345
+//                                                                                )
+//                                                                        )
+//
+//                                                                )
+//                                                        )
+//                                                )
+//                                )
+//                        )
     }
 
     public class Setpositionforservo implements Action {
@@ -317,8 +335,8 @@ public class FiveSpecAuton extends LinearOpMode {
         public class slidesSpec implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                SlideRight.setTargetPosition((int) 410);
-                SlideLeft.setTargetPosition((int) 410);
+                SlideRight.setTargetPosition((int) 420);
+                SlideLeft.setTargetPosition((int) 420);
                 SlideRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 SlideLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 SlideRight.setPower(1);
@@ -329,8 +347,8 @@ public class FiveSpecAuton extends LinearOpMode {
         public class slidesPlaceSpec implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                SlideRight.setTargetPosition((int) 420);
-                SlideLeft.setTargetPosition((int) 420);
+                SlideRight.setTargetPosition((int) 440);
+                SlideLeft.setTargetPosition((int) 440);
                 SlideRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 SlideLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 SlideRight.setPower(1);
