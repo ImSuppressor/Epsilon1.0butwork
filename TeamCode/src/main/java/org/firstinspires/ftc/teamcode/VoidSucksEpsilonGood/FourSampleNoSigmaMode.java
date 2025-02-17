@@ -56,7 +56,19 @@ public class FourSampleNoSigmaMode extends LinearOpMode {
         //TODO:init paths
 
         Action PlaceSample1 = drive.actionBuilder(new Pose2d(-64, 42.5, 1.5708))//place first spec
-                .stopAndAdd(new Slidesruntoposition(1000))
+                .stopAndAdd(new Slidesruntoposition(1100))
+                .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
+                .build();
+        Action PlaceSample2 = drive.actionBuilder(new Pose2d(-64, 42.5, 1.5708))//place first spec
+                .stopAndAdd(new Slidesruntoposition(1100))
+                .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
+                .build();
+        Action PlaceSample3 = drive.actionBuilder(new Pose2d(-64, 42.5, 1.5708))//place first spec
+                .stopAndAdd(new Slidesruntoposition(1100))
+                .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
+                .build();
+        Action PlaceSample4 = drive.actionBuilder(new Pose2d(-64, 42.5, 1.5708))//place first spec
+                .stopAndAdd(new Slidesruntoposition(1100))
                 .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
                 .build();
         Action GrabTape1 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
@@ -80,8 +92,11 @@ public class FourSampleNoSigmaMode extends LinearOpMode {
         Actions.runBlocking(new SequentialAction(
                 PlaceSample1,
                 GrabTape1,
+                PlaceSample2,
                 GrabTape2,
-                GrabTape3
+                PlaceSample3,
+                GrabTape3,
+                PlaceSample4
                 )
 
         );
