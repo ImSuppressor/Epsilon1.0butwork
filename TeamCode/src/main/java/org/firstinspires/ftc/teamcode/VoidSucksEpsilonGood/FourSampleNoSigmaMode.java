@@ -59,7 +59,7 @@ public class FourSampleNoSigmaMode extends LinearOpMode {
                 .stopAndAdd(new Slidesruntoposition(1100))
                 .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
                 .build();
-        Action PlaceSample2 = drive.actionBuilder(new Pose2d(-52, 45, -2.82743))//place first spec
+        Action PlaceSample2 = drive.actionBuilder(new Pose2d(-52, 46, -2.82743))//place first spec
                 .stopAndAdd(new Slidesruntoposition(1100))
                 .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
                 .build();
@@ -72,31 +72,34 @@ public class FourSampleNoSigmaMode extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
                 .build();
         Action GrabTape1 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
-                .stopAndAdd(new Slidesruntoposition(-300))
+                .stopAndAdd(new Slidesruntoposition(-100))
                 .afterTime(.2,new Intakeactions(.45, .45, .95, .5, .45))
                 .afterTime(1,(new Intakeactions(.5, .73, .95, .5, .45)))
-                .strafeToLinearHeading(new Vector2d(-52, 45), -2.82743)
+                .strafeToLinearHeading(new Vector2d(-52, 46), -2.82743)
                 .stopAndAdd(new Intakeactions(.45, .73, .03, .5, .1))
                 .waitSeconds(.5)
+                .stopAndAdd(new Intakeactions(.45, .45, .03, .5, .1))
                 .build();
         Action GrabTape2 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
-                .stopAndAdd(new Slidesruntoposition(-300))
+                .stopAndAdd(new Slidesruntoposition(-100))
                 .afterTime(.2,new Intakeactions(.45, .45, .95, .5, .45))
                 .afterTime(1,(new Intakeactions(.5, .73, .95, .5, .45)))
                 .strafeToLinearHeading(new Vector2d(-50, 58), -2.82743)
                 .waitSeconds(.25)
                 .stopAndAdd(new Intakeactions(.45, .73, .03, .5, .1))
                 .waitSeconds(.6)
+                .stopAndAdd(new Intakeactions(.45, .45, .03, .5, .1))
                 .build();
         Action GrabTape3 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
-                .stopAndAdd(new Slidesruntoposition(-300))
+                .stopAndAdd(new Slidesruntoposition(-100))
                 .afterTime(.2,new Intakeactions(.45, .45, .95, .5, .45))
                 .afterTime(1,(new Intakeactions(.5, .73, .95, .35, .45)))
                 .strafeToLinearHeading(new Vector2d(-46, 58), -2.14675)
                 .stopAndAdd(new Intakeactions(.5, .73, .95, .35, .1))
-                .waitSeconds(.5)
+                .waitSeconds(.35)
                 .stopAndAdd(new Intakeactions(.45, .73, .03, .5, .1))
-                .waitSeconds(.5)
+                .waitSeconds(.65)
+                .stopAndAdd(new Intakeactions(.45, .45, .03, .5, .1))
                 .build();
 
         waitForStart();
@@ -106,16 +109,19 @@ public class FourSampleNoSigmaMode extends LinearOpMode {
                 outtakeClaw.outtakeclawopen(),
                 OUTTAKEARM.transfer(),
                 GrabTape1,
+                outtakeClaw.outtakeclawclose(),
                 OUTTAKEARM.place(),
                 PlaceSample2,
                 outtakeClaw.outtakeclawopen(),
                 OUTTAKEARM.transfer(),
                 GrabTape2,
+                outtakeClaw.outtakeclawclose(),
                 OUTTAKEARM.place(),
                 PlaceSample3,
                 outtakeClaw.outtakeclawopen(),
                 OUTTAKEARM.transfer(),
                 GrabTape3,
+                outtakeClaw.outtakeclawclose(),
                 OUTTAKEARM.place(),
                 PlaceSample4,
                 outtakeClaw.outtakeclawopen(),

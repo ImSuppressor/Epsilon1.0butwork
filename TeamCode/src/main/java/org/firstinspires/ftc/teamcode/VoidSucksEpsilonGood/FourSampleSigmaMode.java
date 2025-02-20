@@ -4,13 +4,13 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.MinMax;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,15 +19,17 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@Autonomous(name="5SpecimenSigmaMode")
-public class FiveSpecAuton extends LinearOpMode {
+@Autonomous(name="FourSampleSigmaMode")
+public class FourSampleSigmaMode extends LinearOpMode {
+
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotorEx SlideL = hardwareMap.get(DcMotorEx.class, "slideLeft");
         DcMotorEx SlideR = hardwareMap.get(DcMotorEx.class, "slideRight");
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, 0));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, 42.5, 1.5708));
         Servo outtakearml = hardwareMap.servo.get("outtakearmL");
         Servo outtakearmr = hardwareMap.servo.get("outtakearmR");
         Servo intakearm = hardwareMap.servo.get("intakeArm");
@@ -42,13 +44,18 @@ public class FiveSpecAuton extends LinearOpMode {
         OuttakeClaw outtakeClaw = new OuttakeClaw(hardwareMap);
         Slides Slides = new Slides(hardwareMap);
         OUTTAKEARM OUTTAKEARM = new OUTTAKEARM(hardwareMap);
-        //init
+        //TODO:Limelight Init
+        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
+        limelight.pipelineSwitch(0); // Switch to pipeline number 0
+        limelight.start(); // This tells Limelight to start looking!
+        //TODO:init
         outtakearmr.setDirection(Servo.Direction.REVERSE);
         linkr.setDirection(Servo.Direction.REVERSE);
         outtakeclaw.setPosition(.6);
         outtakearmr.setPosition(.85);
         outtakearml.setPosition(.85);
-        outtakeswivel.setPosition(.5);
+        outtakeswivel.setPosition(.7);
         linkl.setPosition(.1);
         linkr.setPosition(.1);
         intakearm.setPosition(.45);
@@ -56,163 +63,133 @@ public class FiveSpecAuton extends LinearOpMode {
         intakeswivel.setPosition(.03);
         clawrotate.setPosition(.5);
         //TODO:init paths
-        Action  PlaceSpec1 = drive.actionBuilder(new Pose2d(-64, -7, 0))//place first spec
-                .stopAndAdd(new Slidesruntoposition(330))
-                .afterTime(.85,(new Slidesruntoposition(620)))
-                .strafeToLinearHeading(new Vector2d(-26, -0), 0)
-                .stopAndAdd(new Setpositionforservo(outtakeclaw,0.33))
-                .waitSeconds(.1)
+
+        Action PlaceSample1 = drive.actionBuilder(new Pose2d(-64, 42.5, 1.5708))//place first spec
+                .stopAndAdd(new Slidesruntoposition(1100))
+                .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
                 .build();
-        Action  MoveSample1 = drive.actionBuilder(new Pose2d(-26, -0, 0))//move first sample
+        Action PlaceSample2 = drive.actionBuilder(new Pose2d(-52, 46, -2.82743))//place first spec
+                .stopAndAdd(new Slidesruntoposition(1100))
+                .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
+                .build();
+        Action PlaceSample3 = drive.actionBuilder(new Pose2d(-50, 58, -2.82743))//place first spec
+                .stopAndAdd(new Slidesruntoposition(1100))
+                .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
+                .build();
+        Action PlaceSample4 = drive.actionBuilder(new Pose2d(-48, 58, -2.04204))//place first spec
+                .stopAndAdd(new Slidesruntoposition(1100))
+                .strafeToLinearHeading(new Vector2d(-59, 65), 2.35619)
+                .build();
+        Action GrabTape1 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
                 .stopAndAdd(new Slidesruntoposition(-100))
-                .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .46))
-                .strafeToLinearHeading(new Vector2d(-40, -33), 109.9)
-                .turn(-2.48)
-                .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .35))
-                .build();
-        Action  MoveSample2 = drive.actionBuilder(new Pose2d(-40, -33, 0))//move second sample
-                .afterTime(.4,(new Intakeactions(.88, .45, .125, .5, .47)))
-                .strafeToLinearHeading(new Vector2d(-40, -41.75), 109.95)
-                .turn(-2.7)
-                .stopAndAdd(new Intakeactions(.87, .45, .125, .5, .35))
-                .build();
-        Action MoveSample3 = drive.actionBuilder(new Pose2d(-40, -41.75 , 0))//move third sample
-                .afterTime(.35,new Intakeactions(.87, .45, .125, .5, .46))
-                .strafeToLinearHeading(new Vector2d(-40, -51.5), 109.9)
-                .turn(-3)
+                .afterTime(.2, new Intakeactions(.45, .45, .95, .5, .45))
+                .afterTime(1, (new Intakeactions(.5, .73, .95, .5, .45)))
+                .strafeToLinearHeading(new Vector2d(-52, 46), -2.82743)
+                .stopAndAdd(new Intakeactions(.45, .73, .03, .5, .1))
+                .waitSeconds(.5)
                 .stopAndAdd(new Intakeactions(.45, .45, .03, .5, .1))
                 .build();
-        Action GetSpec2 = drive.actionBuilder(new Pose2d(-40, -51.5, 0))//move to pickup spec 2
-                .stopAndAdd(new Setpositionforservo(outtakearml,0.085))
-                .stopAndAdd(new Setpositionforservo(outtakearmr,0.085))
-                .stopAndAdd(new Setpositionforservo(outtakeswivel,.22))
-                .strafeToLinearHeading(new Vector2d(-68, -41), 0)
-                .stopAndAdd(new Setpositionforservo(outtakeclaw,.6))
-                .build();
-        Action PlaceSpec2 = drive.actionBuilder(new Pose2d(-68, -41, 0))//Place Specimen 2
-                .stopAndAdd(new Setpositionforservo(outtakearml,0.85))
-                .stopAndAdd(new Setpositionforservo(outtakearmr,0.85))
-                .stopAndAdd(new Setpositionforservo(outtakeswivel,.5))
-                .stopAndAdd(new Slidesruntoposition(330))
-                .afterTime(1.50,(new Slidesruntoposition(1050)))
-                .strafeToLinearHeading(new Vector2d(-23, -2), 0)
-                .stopAndAdd(new Setpositionforservo(outtakeclaw,0.33))
-                .waitSeconds(.1)
-                .build();
-        Action GetSpec3 = drive.actionBuilder(new Pose2d(-24, -2, 0))//move to pickup spec 3
-                .stopAndAdd(new Setpositionforservo(outtakearml,0.085))
-                .stopAndAdd(new Setpositionforservo(outtakearmr,0.085))
-                .stopAndAdd(new Setpositionforservo(outtakeswivel,.22))
+        Action GrabTape2 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
                 .stopAndAdd(new Slidesruntoposition(-100))
-                .strafeToLinearHeading(new Vector2d(-67, -41), 0)
-                .stopAndAdd(new Setpositionforservo(outtakeclaw,.6))
+                .afterTime(.2, new Intakeactions(.45, .45, .95, .5, .45))
+                .afterTime(1, (new Intakeactions(.5, .73, .95, .5, .45)))
+                .strafeToLinearHeading(new Vector2d(-50, 58), -2.82743)
+                .waitSeconds(.25)
+                .stopAndAdd(new Intakeactions(.45, .73, .03, .5, .1))
+                .waitSeconds(.6)
+                .stopAndAdd(new Intakeactions(.45, .45, .03, .5, .1))
                 .build();
-        Action PlaceSpec3 = drive.actionBuilder(new Pose2d(-67, -41, 0))//Place Specimen 3
-                .stopAndAdd(new Setpositionforservo(outtakearml,0.85))
-                .stopAndAdd(new Setpositionforservo(outtakearmr,0.85))
-                .stopAndAdd(new Setpositionforservo(outtakeswivel,.5))
-                .stopAndAdd(new Slidesruntoposition(330))
-                .afterTime(1.50,(new Slidesruntoposition(1050)))
-                .strafeToLinearHeading(new Vector2d(-23, -2), 0)
-                .stopAndAdd(new Setpositionforservo(outtakeclaw,0.33))
-                .waitSeconds(.1)
-                .build();
-        Action GetSpec4 = drive.actionBuilder(new Pose2d(-23, -2, 0))//move to pickup spec 4
-                .stopAndAdd(new Setpositionforservo(outtakearml,0.085))
-                .stopAndAdd(new Setpositionforservo(outtakearmr,0.085))
-                .stopAndAdd(new Setpositionforservo(outtakeswivel,.22))
+        Action GrabTape3 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
                 .stopAndAdd(new Slidesruntoposition(-100))
-                .strafeToLinearHeading(new Vector2d(-67, -41), 0)
-                .stopAndAdd(new Setpositionforservo(outtakeclaw,.6))
+                .afterTime(.2, new Intakeactions(.45, .45, .95, .5, .45))
+                .afterTime(1, (new Intakeactions(.5, .73, .95, .35, .45)))
+                .strafeToLinearHeading(new Vector2d(-46, 58), -2.14675)
+                .stopAndAdd(new Intakeactions(.5, .73, .95, .35, .1))
+                .waitSeconds(.35)
+                .stopAndAdd(new Intakeactions(.45, .73, .03, .5, .1))
+                .waitSeconds(.65)
+                .stopAndAdd(new Intakeactions(.45, .45, .03, .5, .1))
                 .build();
-        Action PlaceSpec4 = drive.actionBuilder(new Pose2d(-67, -41, 0))//Place Specimen 4
-                .stopAndAdd(new Setpositionforservo(outtakearml,0.85))
-                .stopAndAdd(new Setpositionforservo(outtakearmr,0.85))
-                .stopAndAdd(new Setpositionforservo(outtakeswivel,.5))
-                .stopAndAdd(new Slidesruntoposition(330))
-                .afterTime(1.50,(new Slidesruntoposition(1050)))
-                .strafeToLinearHeading(new Vector2d(-23, -2), 0)
-                .stopAndAdd(new Setpositionforservo(outtakeclaw,0.33))
-                .waitSeconds(.1)
-                .build();
-        Action GetSpec5 = drive.actionBuilder(new Pose2d(-23, -2, 0))//move to pickup spec 5
-                .stopAndAdd(new Setpositionforservo(outtakearml,0.085))
-                .stopAndAdd(new Setpositionforservo(outtakearmr,0.085))
-                .stopAndAdd(new Setpositionforservo(outtakeswivel,.22))
+
+        Action MoveSub1 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
                 .stopAndAdd(new Slidesruntoposition(-100))
-                .strafeToLinearHeading(new Vector2d(-67, -41), 0)
-                .stopAndAdd(new Setpositionforservo(outtakeclaw,.6))
+                .strafeToLinearHeading(new Vector2d(-46, 58), -2.14675)
                 .build();
-        Action PlaceSpec5 = drive.actionBuilder(new Pose2d(-67, -41, 0))//Place Specimen 5
-                .stopAndAdd(new Setpositionforservo(outtakearml,0.85))
-                .stopAndAdd(new Setpositionforservo(outtakearmr,0.85))
-                .stopAndAdd(new Setpositionforservo(outtakeswivel,.5))
-                .stopAndAdd(new Slidesruntoposition(330))
-                .afterTime(1.5,(new Slidesruntoposition(1100)))
-                .strafeToLinearHeading(new Vector2d(-23, -2), 0)
-                .stopAndAdd(new Setpositionforservo(outtakeclaw,0.33))
-                .waitSeconds(.15)
+        Action GrabSub1 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
+                .strafeToLinearHeading(new Vector2d(-46, 58), -2.14675)
                 .build();
-        Action Park = drive.actionBuilder(new Pose2d(-23, -2, 0))//move to park
-                .stopAndAdd(new Slidesruntoposition(-100))
-                .afterTime(0,new Intakeactions(.45, .45, .03, .5, .4))
-                .strafeToLinearHeading(new Vector2d(-67, -50), 1.3)
-                .build();
+//        while (opModeIsActive()) {
+//            LLResult result = limelight.getLatestResult();
+//            if (result != null) {
+//                if (result.isValid()) {
+//                    Pose3D botpose = result.getBotpose();
+//                    telemetry.addData("ty", result.getTx());//TODO: DO NOT FORGET TX AND TY ARE FLIPPED FOR ROADRUNNER FIELD
+//                    telemetry.addData("tx", result.getTy());
+//                    double tx = result.getTx(); // How far left or right the target is (degrees)
+//                    double ty = result.getTy(); // How far up or down the target is (degrees)
+//                    double ta = result.getTa(); // How big the target looks (0%-100% of the image)
+//                    double inchmultiplierX = 5.75;
+//                    double inchmultiplierY = 3;
+//                    double MoveX = -tx / inchmultiplierX + 3.75 - 64;
+//                    double LinkMoveY = (((ty/inchmultiplierY) - 2.25) * 0.0363636363636364) + .1;
+//                }
+//            }
+//        }
+
 
         waitForStart();
 
-//TODO: WRITE THE CODE HERE YOU MORON
+        //      Actions.runBlocking(new SequentialAction(
+//                        PlaceSample1,
+//                        outtakeClaw.outtakeclawopen(),
+//                        OUTTAKEARM.transfer(),
+//                        GrabTape1,
+//                        outtakeClaw.outtakeclawclose(),
+//                        OUTTAKEARM.place(),
+//                        PlaceSample2,
+//                        outtakeClaw.outtakeclawopen(),
+//                        OUTTAKEARM.transfer(),
+//                        GrabTape2,
+//                        outtakeClaw.outtakeclawclose(),
+//                        OUTTAKEARM.place(),
+//                        PlaceSample3,
+//                        outtakeClaw.outtakeclawopen(),
+//                        OUTTAKEARM.transfer(),
+//                        GrabTape3,
+//                        outtakeClaw.outtakeclawclose(),
+//                        OUTTAKEARM.place(),
+//                        PlaceSample4,
+//                        outtakeClaw.outtakeclawopen(),
+//                        OUTTAKEARM.transfer(),
 
-        Actions.runBlocking(new SequentialAction(//place spec 1
-                PlaceSpec1
-               // PS1,
 
-        ));
-        Actions.runBlocking(new SequentialAction(//move samples
-                MoveSample1,
-                MoveSample2,
-                MoveSample3
-                )
-        );
-        Actions.runBlocking(new SequentialAction(//grab spec 2
-                GetSpec2
-                )
+        //      )
 
-        );
-        Actions.runBlocking(new SequentialAction(//place spec 2
-                PlaceSpec2
-                )
-        );
-        Actions.runBlocking(new SequentialAction(//grab spec 3
-                GetSpec3
-                        )
-        );
-        Actions.runBlocking(new SequentialAction(//place spec 3
-                PlaceSpec3
-                )
-        );
-        Actions.runBlocking(new SequentialAction(// grab spec 4
-                GetSpec4
-                )
-        );
-        Actions.runBlocking(new SequentialAction(//place spec 4
-                PlaceSpec4
-                )
-        );
-        Actions.runBlocking(new SequentialAction(// grab spec 5
-                GetSpec5
-                )
-        );
-        Actions.runBlocking(new SequentialAction(//place spec 5
-                PlaceSpec5
-                )
-        );
-        Actions.runBlocking(new SequentialAction(// park
-                Park
-                )
-        );
+        // );
+        LLResult result = limelight.getLatestResult();
+        if (result != null) {
+            if (result.isValid()) {
+                Pose3D botpose = result.getBotpose();
+                telemetry.addData("ty", result.getTx());//TODO: DO NOT FORGET TX AND TY ARE FLIPPED FOR ROADRUNNER FIELD
+                telemetry.addData("tx", result.getTy());
+                telemetry.update();
+                double tx = result.getTx(); // How far left or right the target is (degrees)
+                double ty = result.getTy(); // How far up or down the target is (degrees)
+                double ta = result.getTa(); // How big the target looks (0%-100% of the image)
+                double inchmultiplierX = 5.75;
+                double inchmultiplierY = 3;
+                double MoveX = -tx / inchmultiplierX + 3.75 - 64;
+                double LinkMoveY = (((ty/inchmultiplierY) - 2.25) * 0.0363636363636364) + .1;
+            }
+        }
+//        Actions.runBlocking(drive.actionBuilder(new Pose2d(-64, 42.5, 1.5708))
+//                .waitSeconds(1)
+//                .strafeToLinearHeading(new Vector2d(MoveX, 42.5), 1.5708)
+//                .stopAndAdd(new Setpositionforlink(LinkMoveY))
+//                .build());
+
     }
-
+    //TODO:Subclasses go here
     public class Setpositionforservo implements Action {
         Servo servo;
         double position;
@@ -409,7 +386,7 @@ public class FiveSpecAuton extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 outtakearmL.setPosition(.85);
                 outtakearmR.setPosition(.85);
-                outtakeswivel.setPosition(.5);
+                outtakeswivel.setPosition(.7);
                 return false;
             }
         }
@@ -423,12 +400,25 @@ public class FiveSpecAuton extends LinearOpMode {
                 return false;
             }
         }
+        public class transfer implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                outtakearmL.setPosition(.09);
+                outtakearmR.setPosition(.09);
+                outtakeswivel.setPosition(.22);
+
+                return false;
+            }
+        }
         public Action place(){
             return new place();
         }
         public Action grab(){
             return new place();
         }
+        public Action transfer(){
+            return new transfer();
+        }
     }
-}
 
+}
