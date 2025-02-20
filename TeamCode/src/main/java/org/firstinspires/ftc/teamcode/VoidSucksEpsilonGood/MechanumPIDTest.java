@@ -25,10 +25,10 @@ public class MechanumPIDTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         DcMotorEx SlideL = hardwareMap.get(DcMotorEx.class, "slideLeft");
         DcMotorEx SlideR = hardwareMap.get(DcMotorEx.class, "slideRight");
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
-        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        DcMotorSimple leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        e leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
+        DcMotorEx rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
+        DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
