@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -116,7 +117,8 @@ public class FourSampleSigmaMode extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-46, 58), -2.14675)
                 .build();
         Action GrabSub1 = drive.actionBuilder(new Pose2d(-59, 65, 2.35619))//place first spec
-                .strafeToLinearHeading(new Vector2d(-46, 58), -2.14675)
+                .strafeToLinearHeading(new Vector2d(-67, -50), 0,
+                        new TranslationalVelConstraint(100))
                 .build();
 //        while (opModeIsActive()) {
 //            LLResult result = limelight.getLatestResult();
@@ -176,6 +178,7 @@ public class FourSampleSigmaMode extends LinearOpMode {
                 double tx = result.getTx(); // How far left or right the target is (degrees)
                 double ty = result.getTy(); // How far up or down the target is (degrees)
                 double ta = result.getTa(); // How big the target looks (0%-100% of the image)
+               // double tr = res
                 double inchmultiplierX = 5.75;
                 double inchmultiplierY = 3;
                 double MoveX = -tx / inchmultiplierX + 3.75 - 64;
