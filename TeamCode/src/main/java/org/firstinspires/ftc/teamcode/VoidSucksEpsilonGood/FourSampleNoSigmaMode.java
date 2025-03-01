@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@Autonomous(name="FourSampleNoSigmaMode")
+@Autonomous(name="FourSampleNoSigmaMode", preselectTeleOp = "epikKodeToDriveTheRobut")
 public class FourSampleNoSigmaMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
